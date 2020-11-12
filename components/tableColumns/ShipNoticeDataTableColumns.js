@@ -79,12 +79,11 @@ const shipNoticeColumns = {
             }
         },
         {
-            name: "xmdhdocno",
-            label: "出通單號",
+            name: "sfec013",
+            label: "儲位",
             options: {
                 filter: true,
                 sort: false,
-                display: false,
             
             }
         },

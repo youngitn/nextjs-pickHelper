@@ -136,7 +136,7 @@ export default function ShipmentNoticeTable() {
                     d = doDataCheck(d);
                     setData(d);
                     dispatch(saveShipmentNoticeData(d));
-
+                    console.log(d)
 
                 }
 
@@ -508,6 +508,9 @@ export default function ShipmentNoticeTable() {
                     </TableCell>
                     <TableCell>
                         <Typography><input type="text" onChange={() => { }} value={data[7]}></input></Typography>
+                    </TableCell>
+                    <TableCell>
+                        <Typography>{data[9]}</Typography>
                     </TableCell>
 
 
