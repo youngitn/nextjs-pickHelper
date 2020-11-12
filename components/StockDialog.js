@@ -10,6 +10,8 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 
 import { selectIsStockDialogOpen, doStockDialogOpen, doStockDialogClose, } from '../lib/formDialogSlice';
+import { selectShipmentNoticeData } from '../lib/shipmentNoticeTableSlice';
+import { selectDialogType } from "../lib/formDialogSlice"
 import { saveStockData, doMaterialNum } from '../lib/stockTableSlice';
 import { useSelector, useDispatch } from 'react-redux';
 //import QRReader from './QRReader'
@@ -39,15 +41,20 @@ const StockDialog = React.forwardRef(function (props, ref) {
     // };
     const classes = useStyles();
     const selectIsStockDialogOpeFlag = useSelector(selectIsStockDialogOpen);
-
+    const selectShipNoticeData = useSelector(selectShipmentNoticeData);
+    const dialogType = useSelector(selectDialogType);
     const textInput = useRef();
 
     const dispatch = useDispatch();
-   
+
     const doClose = () => {
+        let flag = false;
+        
         dispatch(doStockDialogClose());
         dispatch(saveStockData([]));
         dispatch(doMaterialNum(''));
+
+
     }
 
     return (
@@ -63,6 +70,7 @@ const StockDialog = React.forwardRef(function (props, ref) {
                 open={selectIsStockDialogOpeFlag}
                 onClose={doClose}
                 aria-labelledby="form-dialog-title"
+                disableBackdropClick={true}
             >
                 <AppBar className={classes.appBar}>
                     <Toolbar>

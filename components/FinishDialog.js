@@ -20,7 +20,7 @@ import { Grid } from '@material-ui/core';
 import { apiTWVPt100 } from '../api';
 import { selectShipmentNoticeData } from '../lib/shipmentNoticeTableSlice';
 import _ from 'lodash';
-
+import {shipperCreate} from '../lib/shipmentActions';
 const useStyles = makeStyles((theme) => ({
     appBar: {
         position: 'relative',
@@ -64,47 +64,29 @@ const FinishDialog = React.forwardRef(function (props, ref) {
     const doClose = () => {
         dispatch(doFinishDialogClose());
     }
+    const doShipperCreate = () =>{
 
-    const shipperCreate = async () => {
-        let shipperDetail = [];
-        if (_.size(shipmentNoticeData) === 0) {
-            alert('尚無資料');
-            return false;
-        }
-        console.log("出通單品項數量:"+_.size(shipmentNoticeData))
-        shipmentNoticeData.forEach(sn => {
-
-            if (!_.isNaN(sn.stockToShipDatas) && !_.isEmpty(sn.stockToShipDatas) && _.size(sn.stockToShipDatas) > 0) {
-                sn.stockToShipDatas.forEach(element => {
-                    shipperDetail.push({
-                        sn_seq: sn.xmdhseq,
-                        item_no: element.inag001,
-                        warehouse_no: element.inag004,
-                        storage_spaces_no: element.inag005,
-                        lot_no: element.inag006,
-                        qty: element.shipQty
-
-                    })
-                });
-            }
-
+        const set = new Set();
+        const rel = shipmentNoticeData.filter(item => !set.has(item.xmdhdocno) ? set.add(item.xmdhdocno) : false);
+        
+        let temp =[];
+        let x =[];
+        let i = 0;
+        set.forEach(element => {
+            
+            temp[i] = shipmentNoticeData.filter((item) => _.eq(item.xmdhdocno,element ) && !_.isUndefined(item.stockToShipDatas));
+            i++;
 
         });
-
-        console.log(shipperDetail);
-        let data = {
-            shipperNotice: shipmentNoticeData[0].xmdhdocno,
-            shipperDetail: shipperDetail
-        };
-        await apiTWVPt100(data).then(res => {
-            console.log(res.data.payload.std_data.execution);
-            //console.log(res.data.payload.std_data.execution.description);
-            alert("T100創建出貨單結果訊息:" + res.data.payload.std_data.execution.description);
-            alert("出貨單單號:" + res.data.payload.std_data.parameter.shipper_no);
-        }).catch(err => {
-            console.log(err);
+        temp = temp.filter((item) => item.length != 0 );
+        //console.log(temp);
+        temp.forEach(element => {
+            shipperCreate(element);
+            //console.log(element);
         });
+       
     }
+    
 
     return (
         <div>
@@ -140,7 +122,7 @@ const FinishDialog = React.forwardRef(function (props, ref) {
                                 <ColorBtn
                                     edge="end"
                                     fullWidth={true}
-                                    onClick={shipperCreate}
+                                    onClick={doShipperCreate}
                                     aria-label="close"
                                     endIcon={<LocalPrintshopIcon />}
                                 >

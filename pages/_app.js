@@ -13,7 +13,7 @@ const MyApp = ({ Component, pageProps }) => {
           horizontal: 'center',
         }}
 
-          autoHideDuration={1500}
+          autoHideDuration={3000}
 
         >
           <Component {...pageProps} />

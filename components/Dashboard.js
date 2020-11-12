@@ -20,17 +20,20 @@ import StockDialog from './StockDialog';
 import FinishDialog from './FinishDialog';
 
 //import { Route, Link, Switch, HashRouter } from "react-router-dom"
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Button } from '@material-ui/core';
 import { red, grey } from '@material-ui/core/colors';
 import LocalShippingSharpIcon from '@material-ui/icons/LocalShippingSharp';
 import { doFinishDialogOpen } from '../lib/formDialogSlice';
 import { saveLocationList } from '../lib/stockTableSlice'
 import axios from 'axios';
+import { selectDialogType, setCurrentDialogType } from "../lib/formDialogSlice"
+
 function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
+      {//'Copyright © '
+      }
       <Link href="//material-ui.com/">
         <a>VP</a>
       </Link>{' '}
@@ -81,7 +84,7 @@ export default function Dashboard() {
     // localStorage.getItem("fresh");
     if (localStorage.getItem("location") === undefined || localStorage.getItem("location") == null) {
       //判斷庫位儲位管理碼相關物件是否為空,如為空跳出輸入視窗
-      //並執行getLocationList 儲存物件至cookie
+      //並執行getLocationList 儲存物件至Local Storage 
       let num = prompt('請輸入當前庫位編號');
       //庫位編號
 
@@ -92,17 +95,6 @@ export default function Dashboard() {
         "已有庫位資料:" + JSON.parse(localStorage.getItem("location"))[0].inaaId.inaa001);
       setWarehouseNo(JSON.parse(localStorage.getItem("location"))[0].inaaId.inaa001);
     }
-    // if (cookies.location === undefined || cookies.location.length == 0) {
-    //   //判斷庫位儲位管理碼相關物件是否為空,如為空跳出輸入視窗
-    //   //並執行getLocationList 儲存物件至cookie
-    //   let num = prompt('請輸入當前庫位編號');
-    //   //庫位編號
-
-    //   fetchData(num);
-
-    // } else {
-    //   setWarehouseNo(cookies.location[0].inaaId.inaa001);
-    // }
 
   });
   const [warehouseNo, setWarehouseNo] = React.useState('');
@@ -116,10 +108,14 @@ export default function Dashboard() {
   //const selectIsDrOpen = useSelector(selectIsDrawerOpen);
   const classes = useStyles();
   const dispatch = useDispatch();
+
   //const selectShipmentNoticeNum = useSelector(selectShipmentNoticeNumber);
   const [open, setOpen] = React.useState(false);
 
-  const handleCokie = () => {
+  /**
+   * 庫位重置
+   */
+  const handleLocalStorage  = () => {
     //removeCookie('location');
     localStorage.removeItem('location');
     setWarehouseNo("");
@@ -131,6 +127,10 @@ export default function Dashboard() {
     dispatch(doFinishDialogOpen());
   }
 
+  const sDialogType = useSelector(selectDialogType);
+
+
+  //測試client端模擬登入 取得jwt
   const testShiro = () => {
     let url =
       `shiro/login?username='55666&password='wtf'`;
@@ -146,6 +146,7 @@ export default function Dashboard() {
 
   }
 
+  //測試shiro取得token後的權限
   const testShiroRole = () => {
     let url =
       `shiro/testRole`;
@@ -231,32 +232,37 @@ export default function Dashboard() {
       <ColorAppBar color="secondary" position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
 
         <Toolbar className={classes.toolbar}>
-          <Grid container direction="row" justify="space-between" alignItems="center" spacing={3}>
-            <Grid item xs={12} md={4} lg={4}>
+          <Grid container direction="row" justify="space-between" alignItems="center" >
+            <Grid item xs={4} md={4} lg={4}>
               <Typography component="h1" variant="h5" color="inherit" noWrap className={classes.title}>
-                檢貨輔助工具 庫位編號:{warehouseNo}
+                庫位編號:{warehouseNo}
               </Typography>
-            </Grid>
-            <Grid item xs={12} md={2} lg={2}>
-              <ColorBtn onClick={handleCokie} color="primary" variant="contained" fullWidth={true}>
+              <ColorBtn onClick={handleLocalStorage} color="primary" variant="contained">
                 重設庫位
               </ColorBtn>
             </Grid>
-            <Grid item xs={12} md={3} lg={3}>
-              <ColorBtn endIcon={<LocalShippingSharpIcon />} onClick={handleFinishDialogOpen} color="primary" variant="contained" fullWidth={true}>
+          
+            <Grid item xs={2} ></Grid>
+
+            <Grid item xs={2} >
+              <ColorBtn endIcon={<LocalShippingSharpIcon />} onClick={handleFinishDialogOpen} color="primary" variant="contained">
                 檢貨結果預覽
               </ColorBtn>
             </Grid>
-            <Grid item xs={12} md={1} lg={1}>
-              <ColorBtn endIcon={<LocalShippingSharpIcon />} onClick={testShiro} color="primary" variant="contained" fullWidth={true}>
-                test
-              </ColorBtn>
-            </Grid>
-            <Grid item xs={12} md={1} lg={1}>
-              <ColorBtn endIcon={<LocalShippingSharpIcon />} onClick={testShiroRole} color="primary" variant="contained" fullWidth={true}>
-                test role
-          </ColorBtn>
-            </Grid>
+            
+          
+            {
+              //   <Grid item xs={12} md={1} lg={1}>
+              //     <ColorBtn endIcon={<LocalShippingSharpIcon />} onClick={testShiro} color="primary" variant="contained" fullWidth={true}>
+              //       test
+              //     </ColorBtn>
+              //   </Grid>
+              //   <Grid item xs={12} md={1} lg={1}>
+              //     <ColorBtn endIcon={<LocalShippingSharpIcon />} onClick={testShiroRole} color="primary" variant="contained" fullWidth={true}>
+              //       test role
+              // </ColorBtn>
+              //   </Grid>
+            }
           </Grid>
         </Toolbar>
       </ColorAppBar>
@@ -265,6 +271,8 @@ export default function Dashboard() {
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={1}>
+
+
             <Grid item xs={12} md={12} lg={12}>
 
               <ShipmentNoticeTable />
@@ -276,6 +284,7 @@ export default function Dashboard() {
         </Container>
 
       </main>
+
       <div hidden={true}>
         <StockDialog />
         <FinishDialog />

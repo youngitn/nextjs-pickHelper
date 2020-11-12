@@ -68,6 +68,26 @@ const shipNoticeColumns = {
                 sort: false,
             }
         },
+        {
+            name: "xmdh001",
+            label: "訂單",
+            options: {
+                filter: true,
+                sort: false,
+                display: false,
+            
+            }
+        },
+        {
+            name: "xmdhdocno",
+            label: "出通單號",
+            options: {
+                filter: true,
+                sort: false,
+                display: false,
+            
+            }
+        },
         
 
 

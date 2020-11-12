@@ -3,7 +3,7 @@ import MUIDataTable from "mui-datatables";
 
 import TextField from '@material-ui/core/TextField';
 import { useSelector, useDispatch } from 'react-redux';
-import { saveStockHandelRecords, saveStockData, doMaterialNum, selectStockNum, selectStockData, selectStockInfoFromShipNoticeData, selectStockHandelRecords } from '../../lib/stockTableSlice';
+import { saveStockHandelRecords, saveStockData, doMaterialNum, selectStockNum, selectStockData, selectStockInfoFromShipNoticeData, selectStockHandelRecords, numExists } from '../../lib/stockTableSlice';
 import { selectShipmentNoticeData, saveShipmentNoticeData } from '../../lib/shipmentNoticeTableSlice';
 import { selectIsStockDialogOpen, doStockDialogOpen, doStockDialogClose, } from '../../lib/formDialogSlice';
 import {
@@ -25,8 +25,11 @@ import StockTableColumns from '../tableColumns/StockTableColumns';
 import ControlPointIcon from '@material-ui/icons/ControlPoint';
 
 import { useSnackbar } from 'notistack';
-
+import { selectDialogType } from "../../lib/formDialogSlice"
 import _ from 'lodash';
+import { shipperCreate } from '../../lib/shipmentActions';
+
+
 const ValidationTextField = withStyles({
     root: {
         '& input:valid + fieldset': {
@@ -93,7 +96,8 @@ export default function StockTable() {
     const [shipQtySum, setShipQtySum] = useState(0);
 
     const dispatch = useDispatch();
-
+    const sDialogType = useSelector(selectDialogType);
+    const [dialogType, setDialogType] = useState(sDialogType);
 
     const handleFocus = (e) => {
         e.target.select();
@@ -106,24 +110,7 @@ export default function StockTable() {
         stockQtySum(data);
 
     }, [data])
-    /**
-     * 確認該料號是否存在出通單明細中
-     * @param {*料號} num 
-     */
-    const numExists = (num) => {
-        //console.log(shipmentNoticeData);
-        let shipNoticeData = linq.from(shipmentNoticeData)
-            .where(`$.xmdh006 === '${num}' && $.shipQty === 0`)
-            .select("{shipQty:$.xmdh017,seq:$.xmdhseq}").toArray();
 
-        console.log(shipNoticeData);
-        // var newArray = shipmentNoticeData.filter((el) => {
-        //     if (el.xmdh006 === num) {
-        //         return el;
-        //     }
-        // });
-        return shipNoticeData;
-    }
 
     /**
      * call 後端API取得資料
@@ -139,8 +126,8 @@ export default function StockTable() {
             //alert('料號不可為空')
             return false;
         }
-        //console.log(numExists(num)[0]);
-        let stockInfoFromShipNoticeData = numExists(num);
+
+        let stockInfoFromShipNoticeData = numExists(num, shipmentNoticeData);
         // if (stockInfoFromShipNoticeData.length === 0) {
         //     enqueueSnackbar('出通單不存在此料號', {
         //         variant: 'warning',
@@ -310,8 +297,14 @@ export default function StockTable() {
         if (nowShipQtySum > stockInfoFromShipNoticeData.shipQty) {
             setMuiAlertSeverity("error");
 
-        } else {
+        } else if (nowShipQtySum > 0 && nowShipQtySum == stockInfoFromShipNoticeData.shipQty) {
+            setMuiAlertSeverity("success");
+
+        } else if (nowShipQtySum == 0) {
             setMuiAlertSeverity("info");
+
+        } else if (nowShipQtySum > 0 && nowShipQtySum < stockInfoFromShipNoticeData.shipQty) {
+            setMuiAlertSeverity("warning");
 
         }
     }
@@ -331,7 +324,7 @@ export default function StockTable() {
                     rec.inag001 == element.inag001 &&
                     rec.inag004 == element.inag004 &&
                     rec.inag005 == element.inag005 &&
-                    rec.inag006 == element.inag006 
+                    rec.inag006 == element.inag006
                 );
 
             });
@@ -343,7 +336,7 @@ export default function StockTable() {
                     return n.inag001 == target.inag001 &&
                         n.inag004 == target.inag004 &&
                         n.inag005 == target.inag005 &&
-                        n.inag006 == target.inag006 
+                        n.inag006 == target.inag006
                 });
                 let newRec = {};
                 newRec.inag001 = target.inag001;
@@ -374,6 +367,32 @@ export default function StockTable() {
         //_.map(stockHandelRecords, processRecord);
     }
 
+    //只有在dialogType == 1 才會執行
+    const doShipperCreate = () => {
+        //尚未有任何一個項目有確定數量
+        let count = 0;
+
+        shipmentNoticeData.forEach(element => {
+            if (element.shipQty != undefined && element.shipQty > 0) {
+                count++;
+
+            }
+
+        });
+
+        if (count == 0) {
+            alert("請先確定出貨數量");
+
+        } else {
+            shipperCreate(shipmentNoticeData);
+
+
+            dispatch(doStockDialogClose());
+
+
+
+        }
+    }
     //回寫shipmentNoticeTable資料
     //重新產生一份DATA
     const passToShipNoticeTable = () => {
@@ -394,21 +413,15 @@ export default function StockTable() {
         checkRecordIsExistInStockHandelRecords(stockInfoDataToFinishTable);
 
 
-        if (stockInfoDataToFinishTable.length === 0) {
-
-            enqueueSnackbar('數量錯誤', {
-                variant: 'warning',
-            });
-            return false;
-        }
         let keys = Object.keys(shipmentNoticeData[0]);
         const newShipData = shipmentNoticeData.map((x, index) => {
             let obj = {};
 
 
 
-            //console.log(keys);
-            if (x.xmdhseq === stockInfoFromShipNoticeData.seq) {
+
+            console.log(stockInfoFromShipNoticeData);
+            if (x.xmdhseq === stockInfoFromShipNoticeData.seq && x.xmdh001 === stockInfoFromShipNoticeData.orderNum && x.xmdhdocno === stockInfoFromShipNoticeData.xmdhdocno) {
 
                 obj.shipQty = shipQtySum;
 
@@ -428,10 +441,14 @@ export default function StockTable() {
 
         //同步更新出通單資料
         dispatch(saveShipmentNoticeData(newShipData));
+        let afterAddQtyMsg = '數量已設置';
+
         dispatch(doStockDialogClose());
+
+
         dispatch(saveStockData([]));
         dispatch(doMaterialNum(''));
-        enqueueSnackbar('數量已設置', {
+        enqueueSnackbar(afterAddQtyMsg, {
             variant: 'success',
         });
         //doStockDialogClose();
@@ -525,9 +542,9 @@ export default function StockTable() {
 
         <div>
 
-            <Grid container direction="row" justify="center" alignItems="center" spacing={3}>
+            <Grid container direction="row" justify="center" alignItems="center" spacing={1}>
 
-                <Grid item md={6} lg={3}>
+                <Grid item md={3} lg={3}>
 
                     <ValidationTextField
                         className={classes.margin}
@@ -553,7 +570,9 @@ export default function StockTable() {
                     </MuiAlert>
 
                 </Grid>
-                <Grid item xs={12} md={3} lg={4}>
+
+                <Grid item xs={12} md={3} lg={3}>
+
                     <Button
                         variant="contained"
                         color="primary"
@@ -562,15 +581,18 @@ export default function StockTable() {
                     >
                         確定出貨數量
                     </Button>
-                    <Button
+                    {/*<Button
                         variant="contained"
                         color="primary"
                         onClick={(e) => { console.log(stockHandelRecs) }}
                         endIcon={<ControlPointIcon></ControlPointIcon>}
                     >
                         test
-                    </Button>
+                    </Button>*/}
+
                 </Grid>
+
+
             </Grid>
             <Grid container spacing={3}>
                 <Grid item xs={12} >

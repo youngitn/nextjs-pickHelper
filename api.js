@@ -21,6 +21,9 @@ const TWVPt100Request = axios.create({
     baseURL: 'http://192.168.0.5/wstopprd/ws/r/awsp920'
 });
 
+/**
+ * T100 web service 產生出貨單
+ * */
 export const apiTWVPt100 = data => TWVPt100Request.post('', {
     "key": "f5458f5c0f9022db743a7c0710145903",
     "type": "sync",
@@ -38,7 +41,7 @@ export const apiTWVPt100 = data => TWVPt100Request.post('', {
     "payload": {
         "std_data": {
             "parameter": {
-                "shipper_notice": data.shipperNotice,  		
+                "shipper_notice": data.shipperNotice,
                 "shipper_detail": data.shipperDetail
             }
         }

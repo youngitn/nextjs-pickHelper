@@ -7,8 +7,8 @@ const CssStyle = (drawerWidth) => {
             display: 'flex',
         },
         toolbar: {
-            paddingRight: 200, //右邊界距離
-            paddingLeft: 200, //右邊界距離
+            paddingRight: 50, //右邊界距離
+            paddingLeft: 50, //右邊界距離
         },
         toolbarIcon: {
             display: 'flex',
@@ -80,7 +80,7 @@ const CssStyle = (drawerWidth) => {
             flexDirection: 'column',
         },
         fixedHeight: {
-            height: '100',//Recent Deposits方塊高度
+            height: '1000',//Recent Deposits方塊高度
         },
     }));
 }
