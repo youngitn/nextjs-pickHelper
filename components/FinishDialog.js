@@ -79,6 +79,9 @@ const FinishDialog = React.forwardRef(function (props, ref) {
 
         });
         temp = temp.filter((item) => item.length != 0 );
+        if (temp.length == 0){
+            alert('無出貨資料');
+        }
         //console.log(temp);
         temp.forEach(element => {
             shipperCreate(element);
