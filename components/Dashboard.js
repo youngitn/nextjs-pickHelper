@@ -28,6 +28,7 @@ import { doFinishDialogOpen } from '../lib/formDialogSlice';
 import { saveLocationList } from '../lib/stockTableSlice'
 import axios from 'axios';
 import { selectDialogType, setCurrentDialogType } from "../lib/formDialogSlice"
+import { selectLastShipNo } from "../lib/shipmentNoticeTableSlice"
 
 function Copyright() {
   return (
@@ -76,6 +77,7 @@ export default function Dashboard() {
 
   React.useEffect(() => {
     //localStorage.clear();
+    setLastShipNo(selLastShipNo)
     async function fetchData(num) {
       await getLocationList(num);
     }
@@ -97,6 +99,9 @@ export default function Dashboard() {
     }
 
   });
+  const selLastShipNo = useSelector(selectLastShipNo);
+  const [lastShipNo, setLastShipNo] = React.useState(selLastShipNo);
+
   const [warehouseNo, setWarehouseNo] = React.useState('');
   //const [cookies, setCookie, removeCookie] = useCookies([]);
 
@@ -242,7 +247,7 @@ export default function Dashboard() {
               </ColorBtn>
             </Grid>
           
-            <Grid item xs={2} ></Grid>
+            <Grid item xs={2} >已創建出貨單:{lastShipNo}</Grid>
 
             <Grid item xs={2} >
               <ColorBtn endIcon={<LocalShippingSharpIcon />} onClick={handleFinishDialogOpen} color="primary" variant="contained">

@@ -242,9 +242,18 @@ export default function ShipmentNoticeTable() {
     }
 
 
-    const handleFocus = (e) => {
+    const handleMelNumFocus = (e) => {
         e.target.select();
+        e.target.value = '';
         setMelNum('');
+        
+    }
+
+    const handleNumFocus = (e) => {
+        e.target.select();
+        e.target.value = '';
+        
+        setNum('');
     }
 
 
@@ -558,7 +567,7 @@ export default function ShipmentNoticeTable() {
                                 id="shipmentNoticeNumber-outlined-input"
                                 onChange={(e) => setNum(e.target.value)}
                                 onKeyPress={handleTextField}
-                                onFocus={handleFocus}
+                                onFocus={handleNumFocus}
                             /></h2>
                         </Grid>
                         <Grid item xs={12} sm={6} md={6} lg={6}>
@@ -575,7 +584,7 @@ export default function ShipmentNoticeTable() {
                                 inputRef={melNumInput}
                                 onChange={(e) => setMelNum(e.target.value)}
                                 onKeyPress={handleMelNumField}
-                                onFocus={handleFocus}
+                                onFocus={handleMelNumFocus}
                             /></h2>
                         </Grid>
                     </Grid>

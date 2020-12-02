@@ -18,7 +18,8 @@ import LocalPrintshopIcon from '@material-ui/icons/LocalPrintshop';
 import { red, grey } from '@material-ui/core/colors';
 import { Grid } from '@material-ui/core';
 import { apiTWVPt100 } from '../api';
-import { selectShipmentNoticeData } from '../lib/shipmentNoticeTableSlice';
+import { selectShipmentNoticeData,selectLastShipNo ,saveLastShipNo} from '../lib/shipmentNoticeTableSlice';
+
 import _ from 'lodash';
 import {shipperCreate} from '../lib/shipmentActions';
 const useStyles = makeStyles((theme) => ({
@@ -52,7 +53,8 @@ const FinishDialog = React.forwardRef(function (props, ref) {
     // const handleClose = () => {
     //   setOpen(false);
     // };
-
+    const selector = useSelector(selectLastShipNo);
+    const [lastShipNo,setLastShipNo] = React.useState(selector);
     const shipmentNoticeData = useSelector(selectShipmentNoticeData);
     const classes = useStyles();
     const selectIsFinishDialogFlag = useSelector(selectIsFinishDialogOpen);
@@ -66,6 +68,7 @@ const FinishDialog = React.forwardRef(function (props, ref) {
     }
     const doShipperCreate = () =>{
 
+        let allShipNo = '';
         const set = new Set();
         const rel = shipmentNoticeData.filter(item => !set.has(item.xmdhdocno) ? set.add(item.xmdhdocno) : false);
         
@@ -84,10 +87,13 @@ const FinishDialog = React.forwardRef(function (props, ref) {
         }
         //console.log(temp);
         temp.forEach(element => {
-            shipperCreate(element);
+            allShipNo = allShipNo+','+shipperCreate(element).then(function(val){dispatch(saveLastShipNo(val));});
             //console.log(element);
+            
         });
-       
+
+        
+    
     }
     
 

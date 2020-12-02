@@ -227,7 +227,7 @@ export default function LastCartonInputField() {
                         id="custNumInputField"
                         onInput={(e) => handleXmdg005Change(e)}
                         onKeyPress={handleXmdg005KeyPress}
-                    // onFocus={handleFocus}
+                        onFocus={(e)=>{e.target.value='';setXmdg005('')}}
                     /></h2>
                 </Grid>
                 <Grid item xs={12} sm={4} md={4} lg={3}>
@@ -242,6 +242,7 @@ export default function LastCartonInputField() {
                         id="shipDateInputField"
                         inputRef={shipDateInputField}
                         onInput={(e) => handleXmdg028Change(e)}
+                        //onFocus={(e)=>{e.target.value=''}}
                     //onKeyPress={handleXmdg028KeyPress}
                     // onFocus={handleFocus}
                     /></h2>
@@ -259,7 +260,7 @@ export default function LastCartonInputField() {
                         inputRef={targetInputField}
                         onChange={(e) => setMelNum(e.target.value)}
                         onKeyPress={handleMelNumField}
-                        onFocus={(e)=>{e.target.value=''}}
+                        onFocus={(e)=>{e.target.value='',setMelNum('')}}
                     /></h2>
 
                 </Grid>
