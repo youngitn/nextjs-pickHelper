@@ -30,6 +30,8 @@ import axios from 'axios';
 import { selectDialogType, setCurrentDialogType } from "../lib/formDialogSlice"
 import { selectLastShipNo } from "../lib/shipmentNoticeTableSlice"
 
+import { LeakRemoveTwoTone } from '@material-ui/icons';
+
 function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
@@ -54,7 +56,7 @@ const ColorAppBar = withStyles((theme) => ({
   },
 }))(AppBar);
 
-const ColorBtn = withStyles((theme) => ({
+const ButtonGrey = withStyles((theme) => ({
   root: {
     color: theme.palette.getContrastText(grey[200]),
     backgroundColor: grey[200],
@@ -231,6 +233,11 @@ export default function Dashboard() {
       });
 
   };
+
+  const handleShipNumHisListDialogOpen = () =>{
+    alert("");
+  }
+
   return (
     <div className={classes.root}>
 
@@ -242,17 +249,17 @@ export default function Dashboard() {
               <Typography component="h1" variant="h5" color="inherit" noWrap className={classes.title}>
                 庫位編號:{warehouseNo}
               </Typography>
-              <ColorBtn onClick={handleLocalStorage} color="primary" variant="contained">
+              <ButtonGrey onClick={handleLocalStorage} color="primary" variant="contained">
                 重設庫位
-              </ColorBtn>
+              </ButtonGrey>
             </Grid>
           
-            <Grid item xs={2} >已創建出貨單:{lastShipNo}</Grid>
+            <Grid item xs={2} ><ButtonGrey onClick={handleShipNumHisListDialogOpen}>已創建出貨單:{lastShipNo}</ButtonGrey></Grid>
 
             <Grid item xs={2} >
-              <ColorBtn endIcon={<LocalShippingSharpIcon />} onClick={handleFinishDialogOpen} color="primary" variant="contained">
+              <ButtonGrey endIcon={<LocalShippingSharpIcon />} onClick={handleFinishDialogOpen} color="primary" variant="contained">
                 檢貨結果預覽
-              </ColorBtn>
+              </ButtonGrey>
             </Grid>
             
           

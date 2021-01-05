@@ -136,9 +136,10 @@ export default function LastCartonInputField() {
                 });
                 return false;
             } else {
-
+                console.log(inputValueArray[0]+' '+shipmentNoticeData+' '+inputValueArray[1]);
                 //取得物料資訊 數量 項次 訂單號碼(對應庫存批號) "{shipQty:$.xmdh017,seq:$.xmdhseq,orderNum:$.xmdh001}"
                 stockInfoFromShipNoticeData = numExists(inputValueArray[0], shipmentNoticeData, inputValueArray[1]);
+                //console.log(stockInfoFromShipNoticeData.length);
                 //批號全域狀態設定
                 dispatch(doOrderNum(inputValueArray[1]));
 
